@@ -1,0 +1,25 @@
+{
+  "name": "string-markov",
+  "version": "1.0.0",
+  "description": "A package for probabilistically generating text using markov chains",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/thomascastleman/string-markov.git"
+  },
+  "keywords": [
+    "markov",
+    "chain",
+    "string",
+    "text"
+  ],
+  "author": "Thomas Castleman",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/thomascastleman/string-markov/issues"
+  },
+  "homepage": "https://github.com/thomascastleman/string-markov#readme"
+}
