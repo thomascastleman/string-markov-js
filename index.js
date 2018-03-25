@@ -1,4 +1,6 @@
 
+var fs = require('fs');
+
 // public hashmap from ngram arrays to all possible following words
 exports.nextWord = {};
 
@@ -26,6 +28,8 @@ exports.trainOnString = function(string, ngram) {
 			next = words[ind];
 		}
 
+		sub = key(sub);
+
 		// add entry to hashmap
 		if (exports.nextWord[sub]) {
 			exports.nextWord[sub].push(next);
@@ -36,20 +40,24 @@ exports.trainOnString = function(string, ngram) {
 }
 
 // read in a file and train using a given ngram size
-exports.trainOnFile = function(filename, ngram) {
-
+exports.trainOnFile = function(filename, ngram, callback) {
+	fs.readFile('./' + filename, 'UTF8', function(err, data) {
+		if (err) throw err;
+		exports.trainOnString(data, ngram);
+		callback();
+	});
 }
 
 // generate a given amount of words based on 
 exports.generate = function(size) {
-	var key = Object.keys(exports.nextWord);
-	var markovText = key[Math.floor(Math.random() * key.length)].split(',');
+	var randKey = Object.keys(exports.nextWord);
+	var markovText = randKey[Math.floor(Math.random() * randKey.length)].split('^');
 	var ngram = markovText.length;
 
 	if (size >= ngram) {
-
+		// for length requested
 		for (var i = 0; i < size - ngram; i++) {
-			var lastNGram = markovText.slice(markovText.length - ngram, markovText.length);
+			var lastNGram = key(markovText.slice(markovText.length - ngram, markovText.length));
 
 			// get all possible following words
 			var possibilities = exports.nextWord[lastNGram];
@@ -65,10 +73,16 @@ exports.generate = function(size) {
 	}
 }
 
+// format an ngram for entry into hashmap
+function key(gram) {
+	return gram.join('^');
+
+}
+
 // format string for training
 function trimAndFormat(string) {
-	// replace all excess newlines with spaces and then replace repeated spaces with single space, and split
-	var s = string.replace(/\n+/g, ' ').replace(/\s+/g, ' ').split(' ');
+	// replace all excess newlines with spaces, replace repeated spaces with single space, remove delimiter, split into words
+	var s = string.replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace('^', '').split(' ');
 	
 	// remove possible empty words
 	if (s[0] == '') {
@@ -80,14 +94,3 @@ function trimAndFormat(string) {
 
 	return s;
 }
-
-
-var test = "\n \ncontent here are those and here are those other some words\n\n\n\n\n and here\n is another word\n\n\n ";
-
-// console.log(trimAndFormat(test));
-
-exports.trainOnString(test, 3);
-
-var text = exports.generate(3);
-
-console.log(text);
