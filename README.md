@@ -1,4 +1,4 @@
-# string-markov
+# string-markov-js
 A nodejs package for probabilistically generating text using markov chains.
 
 #### Including the module:
