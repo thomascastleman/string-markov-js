@@ -33,30 +33,33 @@ function DataSet() {
 
 	// train on a string using a given ngram size
 	this.trainOnString = function(string, ngram) {
-		var words = trimAndFormat(string);
-		var sub;
+		// if valid ngram
+		if (ngram > 0) {
+			var words = trimAndFormat(string);
+			var sub;
 
-		// for every possible ngram in text
-		for (var i = 0; i < words.length; i++) {
-			if (i < words.length - ngram) {
-				// get ngram subarray and word following
-				sub = words.slice(i, i + ngram);
-				next = words[i + ngram];
-			} else {
-				// wrap around to start of training text for continuity
-				sub = words.slice(i, words.length);
-				sub.push.apply(sub, words.slice(0, ngram - sub.length));
-				next = words[ngram - (words.length - i)];
-			}
+			// for every possible ngram in text
+			for (var i = 0; i < words.length; i++) {
+				if (i < words.length - ngram) {
+					// get ngram subarray and word following
+					sub = words.slice(i, i + ngram);
+					next = words[i + ngram];
+				} else {
+					// wrap around to start of training text for continuity
+					sub = words.slice(i, words.length);
+					sub.push.apply(sub, words.slice(0, ngram - sub.length));
+					next = words[ngram - (words.length - i)];
+				}
 
-			// convert to indexable format
-			sub = key(sub);
+				// convert to indexable format
+				sub = key(sub);
 
-			// add ngram linked to next word in hashmap
-			if (this.data[sub]) {
-				this.data[sub].push(next);
-			} else {
-				this.data[sub] = [next];
+				// add ngram linked to next word in hashmap
+				if (this.data[sub]) {
+					this.data[sub].push(next);
+				} else {
+					this.data[sub] = [next];
+				}
 			}
 		}
 	}
