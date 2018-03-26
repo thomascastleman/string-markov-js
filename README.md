@@ -11,7 +11,7 @@ var markov = require('string-markov-js');
 ## Creating new training data set
 A data set can be trained and can generate text using its training texts. To initialize a new data set, use:
 ```javascript
-var corpus = markov.newDataSet();
+var dataset = markov.newDataSet();
 ```
 This way, many different datasets can be trained on different texts, and used concurrently.
 
@@ -22,7 +22,7 @@ This way, many different datasets can be trained on different texts, and used co
 var string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
 var ngram = 2;
 
-corpus.trainOnString(string, ngram);
+dataset.trainOnString(string, ngram);
 ```
 
 #### From a file
@@ -30,14 +30,14 @@ corpus.trainOnString(string, ngram);
 var filename = 'training.txt';
 var ngram = 3;
 
-corpus.trainOnFile(filename, ngram, function() {
+dataset.trainOnFile(filename, ngram, function() {
 	console.log("Training complete.");
 });
 ```
 
 If you wish to train on a set of files, ```trainOnFile``` can also take in an array of filenames, as such:
 ```javascript
-corpus.trainOnFile(['beemoviescript.txt', 'constitution.txt'], 3, function() {
+dataset.trainOnFile(['beemoviescript.txt', 'constitution.txt'], 3, function() {
 	console.log("Training complete.");
 });
 ```
@@ -45,11 +45,11 @@ corpus.trainOnFile(['beemoviescript.txt', 'constitution.txt'], 3, function() {
 #### Clearing data
 If you wish to clear a given data set, call:
 ```javascript
-corpus.clearData();
+dataset.clearData();
 ```
 
 ## Generating Text
 ```javascript
 // generate 100 words of text
-var text = corpus.generate(100);
+var text = dataset.generate(100);
 ```
