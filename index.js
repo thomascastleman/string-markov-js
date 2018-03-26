@@ -4,7 +4,6 @@ var fs = require('fs');
 // format an ngram for entry into hashmap
 function key(gram) {
 	return gram.join('^');
-
 }
 
 // format string for training
@@ -66,14 +65,39 @@ function DataSet() {
 	this.trainOnFile = function(filename, ngram, callback) {
 		var self = this;
 
-		// read given file
-		fs.readFile('./' + filename, 'UTF8', function(err, data) {
-			if (err) throw err;
+		// if single file given
+		if (typeof filename === 'string' || filename instanceof String) {
+			// read given file
+			fs.readFile('./' + filename, 'UTF8', function(err, data) {
+				if (err) throw err;
 
-			// train on file content string
-			self.trainOnString(data, ngram);
-			callback();
-		});
+				// train on file content string
+				self.trainOnString(data, ngram);
+				callback();
+			});
+
+		// if array of filenames given
+		} else if (filename instanceof Array) {
+			var fullData = "";
+			var completed = 0;
+
+			// read each file
+			for (var i = 0; i < filename.length; i++) {
+				fs.readFile('./' + filename[i], 'UTF8', function(err, data) {
+					if (err) throw err;
+
+					completed++;		// increment number of files read
+					fullData += ' ' + data;	// add file contents
+
+					// if all files read
+					if (completed == filename.length) {
+						// train on full string and callback
+						self.trainOnString(fullData, ngram);
+						callback();
+					}
+				});
+			}
+		}
 	}
 
 	// generate a given amount of words based on 
@@ -109,17 +133,3 @@ function DataSet() {
 		this.data = {};
 	}
 }
-
-
-
-// ----------------------------
-
-var markov = exports;
-
-var corpus1 = markov.newDataSet();
-
-corpus1.trainOnFile('test.txt', 2, function() {
-	console.log(corpus1.data);
-});
-
-
