@@ -7,10 +7,19 @@ function key(gram) {
 }
 
 // format string for training
-function trimAndFormat(string) {
-	// replace all excess newlines with spaces, replace repeated spaces with single space, remove delimiter, split into words
-	var s = string.replace(/\n+/g, ' ').replace(/\s+/g, ' ').replace('^', '').split(' ');
-	
+function trimAndFormat(string, lineBreaks) {
+	if (lineBreaks) {
+		// replace all excess newlines with single, replace repeated spaces with single space
+		var s = string.replace(/\n+/g, ' \n ').replace(/[^\S\n]+/g, ' ');
+	} else {
+		// remove newlines, reduce spaces
+		var s = string.replace(/\n+/g, ' ').replace(/\s+/g, ' ');
+	}
+
+	// remove all delimiter char, split into words
+	s = s.replace('^', '').split(' ');
+
+
 	// remove possible empty words
 	if (s[0] == '') {
 		s.shift();
@@ -29,13 +38,14 @@ exports.newDataSet = function() {
 
 // object to training and markov generation
 function DataSet() {
-	this.data = {};
+	this.data = {};			// map of ngrams to their possibilities
+	this.capitalized = [];	// list of all capitalized ngrams
 
 	// train on a string using a given ngram size
-	this.trainOnString = function(string, ngram) {
+	this.trainOnString = function(string, ngram, preserveLineBreaks) {
 		// if valid ngram
 		if (ngram > 0) {
-			var words = trimAndFormat(string);
+			var words = trimAndFormat(string, preserveLineBreaks);
 			var sub;
 
 			// for every possible ngram in text
@@ -60,12 +70,17 @@ function DataSet() {
 				} else {
 					this.data[sub] = [next];
 				}
+
+				// keep track of all capitalized ngrams
+				if (sub[0].match(/[A-Z]/g) && this.capitalized.indexOf(sub) == -1) {
+					this.capitalized.push(sub);
+				}
 			}
 		}
 	}
 
 	// read in a file and train using a given ngram size
-	this.trainOnFile = function(filename, ngram, callback) {
+	this.trainOnFile = function(filename, ngram, preserveLineBreaks, callback) {
 		var self = this;
 
 		// if single file given
@@ -75,7 +90,7 @@ function DataSet() {
 				if (err) throw err;
 
 				// train on file content string
-				self.trainOnString(data, ngram);
+				self.trainOnString(data, ngram, preserveLineBreaks);
 				callback();
 			});
 
@@ -90,12 +105,12 @@ function DataSet() {
 					if (err) throw err;
 
 					completed++;		// increment number of files read
-					fullData += ' ' + data;	// add file contents
+					fullData += '\n' + data;	// add file contents
 
 					// if all files read
 					if (completed == filename.length) {
 						// train on full string and callback
-						self.trainOnString(fullData, ngram);
+						self.trainOnString(fullData, ngram, preserveLineBreaks);
 						callback();
 					}
 				});
@@ -103,10 +118,10 @@ function DataSet() {
 		}
 	}
 
-	// generate a given amount of words based on 
-	this.generate = function(size) {
+	// generate a given amount of words based on
+	this.generate = function(size, capitalize) {
 		// start text with a random ngram chain from hashmap
-		var randKey = Object.keys(this.data);
+		var randKey = capitalize ? this.capitalized : Object.keys(this.data);
 		var markovText = randKey[Math.floor(Math.random() * randKey.length)].split('^');
 		var ngram = markovText.length;
 
@@ -136,3 +151,17 @@ function DataSet() {
 		this.data = {};
 	}
 }
+
+
+// // ----------------------------------=
+
+
+// var data = exports.newDataSet();
+
+// // filename
+// data.trainOnFile('test.txt', 1, true, function() {
+// 	console.log(data.generate(300, true));
+// });
+
+
+// // originality checking
