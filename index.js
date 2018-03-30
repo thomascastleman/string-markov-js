@@ -124,7 +124,7 @@ function DataSet() {
 	// generate a given amount of words based on
 	this.generate = function(size, capitalize) {
 		// start text with a random ngram chain from hashmap
-		var randKey = capitalize ? this.capitalized : Object.keys(this.data);
+		var randKey = capitalize && this.capitalized.length > 0 ? this.capitalized : Object.keys(this.data);
 		var markovText = randKey[Math.floor(Math.random() * randKey.length)].split('^');
 		var ngram = markovText.length;
 

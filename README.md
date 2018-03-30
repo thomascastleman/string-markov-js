@@ -3,6 +3,11 @@ A nodejs package for probabilistically generating text using markov chains.
 
 www.npmjs.com/package/string-markov-js
 
+To install, enter the directory of your node package, and type
+```
+npm install string-markov-js
+```
+
 #### Including the module:
 ```javascript
 var markov = require('string-markov-js');
@@ -21,23 +26,26 @@ This way, many different datasets can be trained on different texts, and used co
 ```javascript
 var string = "Lorem ipsum dolor sit amet, consectetur adipiscing elit";
 var ngram = 2;
+var preserveLineBreaks = true;
 
-dataset.trainOnString(string, ngram);
+dataset.trainOnString(string, ngram, preserveLineBreaks);
 ```
 
 #### From a file
 ```javascript
 var filename = 'training.txt';
 var ngram = 3;
+var preserveLineBreaks = true;
 
-dataset.trainOnFile(filename, ngram, function() {
+dataset.trainOnFile(filename, ngram, preserveLineBreaks, function() {
 	console.log("Training complete.");
 });
 ```
+Line breaks can be preserved to maintain a similar structure to the training corpus (e.g. in the case of poetry), or they can be removed. 
 
 If you wish to train on a set of files, ```trainOnFile``` can also take in an array of filenames, as such:
 ```javascript
-dataset.trainOnFile(['beemoviescript.txt', 'constitution.txt'], 3, function() {
+dataset.trainOnFile(['beemoviescript.txt', 'constitution.txt'], 3, true, function() {
 	console.log("Training complete.");
 });
 ```
@@ -50,6 +58,15 @@ dataset.clearData();
 
 ## Generating Text
 ```javascript
-// generate 100 words of text
-var text = dataset.generate(100);
+var startWithCapitalNGram = true;
+
+// generate 100 words of text, beginning with an ngram that was capitalized in the training corpus
+var text = dataset.generate(100, startWithCapitalNGram);
+```
+The capitalized option allows you to prevent starting the generated text in the middle of a sentence, if the training data is in such a format.
+
+## Ensuring originality
+To check whether or not a segment of generated text has accidentally copied the training corpus word-for-word, the ```checkOriginality``` function can be called:
+```javascript
+dataset.checkOriginality("Is this string in the training corpus?");
 ```
