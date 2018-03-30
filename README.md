@@ -51,7 +51,7 @@ dataset.trainOnFile(['beemoviescript.txt', 'constitution.txt'], 3, true, functio
 ```
 
 #### Clearing data
-If you wish to clear a given data set, call:
+If you wish to remove all training data from a given data set, call:
 ```javascript
 dataset.clearData();
 ```
