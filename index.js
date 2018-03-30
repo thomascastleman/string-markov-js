@@ -19,7 +19,6 @@ function trimAndFormat(string, lineBreaks) {
 	// remove all delimiter char, split into words
 	s = s.replace('^', '').split(' ');
 
-
 	// remove possible empty words
 	if (s[0] == '') {
 		s.shift();
@@ -40,11 +39,15 @@ exports.newDataSet = function() {
 function DataSet() {
 	this.data = {};			// map of ngrams to their possibilities
 	this.capitalized = [];	// list of all capitalized ngrams
+	this.fullCorpus = "";
 
 	// train on a string using a given ngram size
 	this.trainOnString = function(string, ngram, preserveLineBreaks) {
 		// if valid ngram
 		if (ngram > 0) {
+			// populate full corpus
+			this.fullCorpus += '\n' + string;
+
 			var words = trimAndFormat(string, preserveLineBreaks);
 			var sub;
 
@@ -146,22 +149,15 @@ function DataSet() {
 		}
 	}
 
+	// check if a string is fully original from the training corpus
+	this.checkOriginality = function(string) {
+		return this.fullCorpus.indexOf(string) == -1 ? true : false;
+	}
+
 	// reset any training data
 	this.clearData = function() {
 		this.data = {};
+		this.capitalized = [];
+		this.fullCorpus = "";
 	}
 }
-
-
-// // ----------------------------------=
-
-
-// var data = exports.newDataSet();
-
-// // filename
-// data.trainOnFile('test.txt', 1, true, function() {
-// 	console.log(data.generate(300, true));
-// });
-
-
-// // originality checking
