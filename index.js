@@ -160,4 +160,19 @@ function DataSet() {
 		this.capitalized = [];
 		this.fullCorpus = "";
 	}
+
+	// get all possible words following a given ngram
+	this.getPossibilities = function(gram) {
+		return this.data[key(gram)];
+	}
+
+	// manually add new ngram, word pair to dataset
+	this.updateGram = function(gram, next) {
+		var k = key(gram);
+		if (this.data[k]) {
+			this.data[k].push(next);
+		} else {
+			this.data[k] = [next];
+		}
+	}
 }

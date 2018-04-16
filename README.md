@@ -70,3 +70,15 @@ To check whether or not a segment of generated text has accidentally copied the 
 ```javascript
 dataset.checkOriginality("Is this string in the training corpus?");
 ```
+
+## Manually interacting with dataset
+If you're looking for more direct interaction with a training set, you can use ```getPossibilities``` to get all the possible words that follow a given gram
+```javascript
+dataset.getPossibilities(['words', 'that', 'follow', 'this']);
+```
+
+Or if you want to manually add an entry to the dataset, you can use ```updateGram```
+```javascript
+dataset.updateGram(['manually', 'added'], 'ngram');
+```
+which will add a new ngram or update a previous one. 
