@@ -1,6 +1,6 @@
 {
   "name": "string-markov-js",
-  "version": "1.2.2",
+  "version": "1.2.3",
   "description": "A package for probabilistically generating text using markov chains",
   "main": "index.js",
   "scripts": {
