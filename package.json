@@ -17,7 +17,7 @@
     "text"
   ],
   "author": "Thomas Castleman",
-  "license": "ISC",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/thomascastleman/string-markov-js/issues"
   },
