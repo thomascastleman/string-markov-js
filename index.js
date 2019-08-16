@@ -182,6 +182,7 @@ function DataSet() {
 	}
 
 	// get a complete sentence from the markov chain
+	this.sentence = function() {
 		// start text with a random ngram chain from hashmap
 		var markovText = this.capitalized[Math.floor(Math.random() * this.capitalized.length)].split('^');
 		var ngram = markovText.length;
