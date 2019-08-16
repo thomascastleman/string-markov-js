@@ -65,6 +65,12 @@ var text = dataset.generate(100, startWithCapitalNGram);
 ```
 The capitalized option allows you to prevent starting the generated text in the middle of a sentence, if the training data is in such a format.
 
+To generate a single complete sentence, use the `sentence()` function:
+
+```javascript
+var s = dataset.sentence();
+```
+
 ## Ensuring originality
 To check whether or not a segment of generated text has accidentally copied the training corpus word-for-word, the ```checkOriginality``` function can be called:
 ```javascript

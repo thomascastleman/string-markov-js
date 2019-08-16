@@ -89,12 +89,15 @@ function DataSet() {
 		// if single file given
 		if (typeof filename === 'string' || filename instanceof String) {
 			// read given file
-			fs.readFile('./' + filename, 'UTF8', function(err, data) {
-				if (err) throw err;
+			fs.readFile(__dirname + '/' + filename, 'UTF8', function(err, data) {
+				if (!err) {
+					// train on file content string
+					self.trainOnString(data, ngram, preserveLineBreaks);
 
-				// train on file content string
-				self.trainOnString(data, ngram, preserveLineBreaks);
-				callback();
+					callback();
+				} else {
+					callback(err);
+				}
 			});
 
 		// if array of filenames given
@@ -104,17 +107,19 @@ function DataSet() {
 
 			// read each file
 			for (var i = 0; i < filename.length; i++) {
-				fs.readFile('./' + filename[i], 'UTF8', function(err, data) {
-					if (err) throw err;
+				fs.readFile(__dirname + '/' + filename[i], 'UTF8', function(err, data) {
+					if (!err) {
+						completed++;		// increment number of files read
+						fullData += '\n' + data;	// add file contents
 
-					completed++;		// increment number of files read
-					fullData += '\n' + data;	// add file contents
-
-					// if all files read
-					if (completed == filename.length) {
-						// train on full string and callback
-						self.trainOnString(fullData, ngram, preserveLineBreaks);
-						callback();
+						// if all files read
+						if (completed == filename.length) {
+							// train on full string and callback
+							self.trainOnString(fullData, ngram, preserveLineBreaks);
+							callback();
+						}
+					} else {
+						callback(err);
 					}
 				});
 			}
@@ -173,6 +178,43 @@ function DataSet() {
 			this.data[k].push(next);
 		} else {
 			this.data[k] = [next];
+		}
+	}
+
+	// get a complete sentence from the markov chain
+		// start text with a random ngram chain from hashmap
+		var markovText = this.capitalized[Math.floor(Math.random() * this.capitalized.length)].split('^');
+		var ngram = markovText.length;
+
+		// check if sentence end already found
+		if (markovText.length > 0) {
+			// get last word
+			var last = markovText[markovText.length - 1];
+
+			// get last char of last word
+			if (last[last.length - 1] == '.') {
+				return markovText.join(' ');
+			}
+		} else {
+			return undefined;
+		}
+
+		// until a sentence end reached
+		while (true) {
+			// extract the last n words from current generated text
+			var lastNGram = key(markovText.slice(markovText.length - ngram, markovText.length));
+
+			// get all possible following words
+			var possibilities = this.data[lastNGram];
+
+			// apply a random possible next word
+			var next = possibilities[Math.floor(Math.random() * possibilities.length)];
+			markovText.push(next);
+
+			// if this word ends the sentence, return
+			if (next[next.length - 1] == '.') {
+				return markovText.join(' ');
+			}
 		}
 	}
 }
