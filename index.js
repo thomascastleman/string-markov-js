@@ -182,40 +182,59 @@ function DataSet() {
 	}
 
 	// get a complete sentence from the markov chain
-	this.sentence = function() {
+	this.sentence = function(lineLen, lineLenVar) {
+		// generate length of this sentence using requested line length & variance
+		var l = Math.floor(lineLen + (Math.random() * (lineLenVar || 0) * (Math.random() < 0.5 ? -1 : 1)));
+
 		// start text with a random ngram chain from hashmap
 		var markovText = this.capitalized[Math.floor(Math.random() * this.capitalized.length)].split('^');
 		var ngram = markovText.length;
 
 		// check if sentence end already found
 		if (markovText.length > 0) {
-			// get last word
-			var last = markovText[markovText.length - 1];
 
-			// get last char of last word
-			if (last[last.length - 1] == '.') {
-				return markovText.join(' ');
+			// until a sentence end reached
+			while (true) {
+				// extract the last n words from current generated text
+				var lastNGram = key(markovText.slice(markovText.length - ngram, markovText.length));
+
+				// get all possible following words
+				var possibilities = this.data[lastNGram];
+
+				// if we've reached desired line length  
+				if (markovText.length >= l) {
+					var endings = [];
+
+					// find all possible follow words that end sentences
+					for (var i = 0; i < possibilities.length; i++) {
+						if (isEndingWord(possibilities[i])) {
+							endings.push(possibilities[i]);
+						}
+					}
+
+					// replace possibilities with only endings, if endings are available
+					if (endings.length > 0) {
+						possibilities = endings;
+					}
+				}
+
+				// apply a random possible next word
+				var next = possibilities[Math.floor(Math.random() * possibilities.length)];
+				markovText.push(next);
+
+				// if this word ends the sentence, return
+				if (markovText.length >= l && isEndingWord(next)) {
+					return markovText.join(' ');
+				}
 			}
+
 		} else {
 			return undefined;
 		}
-
-		// until a sentence end reached
-		while (true) {
-			// extract the last n words from current generated text
-			var lastNGram = key(markovText.slice(markovText.length - ngram, markovText.length));
-
-			// get all possible following words
-			var possibilities = this.data[lastNGram];
-
-			// apply a random possible next word
-			var next = possibilities[Math.floor(Math.random() * possibilities.length)];
-			markovText.push(next);
-
-			// if this word ends the sentence, return
-			if (next[next.length - 1] == '.') {
-				return markovText.join(' ');
-			}
-		}
 	}
+}
+
+// check if a word ends a sentence based on punctuation
+function isEndingWord(w) {
+	return /[\?\!\.]/g.test(w[w.length - 1]);
 }

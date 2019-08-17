@@ -65,10 +65,10 @@ var text = dataset.generate(100, startWithCapitalNGram);
 ```
 The capitalized option allows you to prevent starting the generated text in the middle of a sentence, if the training data is in such a format.
 
-To generate a single complete sentence, use the `sentence()` function:
+To generate a single complete sentence, use the `sentence()` function, which takes in a requested line length, and optionally, a variance in this line length.
 
 ```javascript
-var s = dataset.sentence();
+var s = dataset.sentence(lineLength, lineLengthVariance);
 ```
 
 ## Ensuring originality
